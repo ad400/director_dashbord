@@ -1,9 +1,69 @@
+<?Php
+ include('data.php');
+
+$idError = "";
+$nameError = "";
+$passError = "";
+$Admin = "";
+$delAdmin = "";
+$emailError = "";
+$deleteError = "";
+$emailRegex = '/^[a-zA-Z0-9]+([-._]?[a-zA-Z0-9])*@{1}[a-zA-Z0-9]+([-._]?[a-zA-Z0-9])*[a-zA-Z0-9]{2,8}$/';
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+  $id = $_POST['id'] ?? '';
+  $nom = $_POST['nom'] ?? '';
+  $email = $_POST['email'] ?? '';
+  $action = $_POST['action'] ?? '';
+
+  if (empty($id)) {
+    $idError = '<p class="Erreur">Remplir le champ</p>';
+  } elseif (!preg_match('/^[0-9]{1,11}$/', $id)) {
+    $idError = '<p class="verification">Syntax Erreur</p>';
+  }
+
+  if (empty($nom)) {
+    $nomError = '<p class="Erreur">Remplir le champ</p>';
+  } elseif (!preg_match('/^[a-zA-Z]{3,15}$/', $nom)) {
+    $nomError = '<p class="verification">Syntax Erreur</p>';
+  }
+
+  if (empty($email)) {
+    $emailError = '<p class="Erreur">Entrez votre email</p>';
+  } elseif (!preg_match(/*'/^[a-zA-Z0-9._-]+@gmail\.com$/'*/ $emailRegex, $email)) {
+    $emailError = '<p class="verification">Syntax Erreur</p>';
+  }
+
+  if (empty($idError) && empty($nomError) && empty($emailError)) {
+    $_SESSION['id'] = $id;
+    $_SESSION['nom'] = $nom;
+    $_SESSION['email'] = $email;
+    if ($_POST['action'] == 'add') {
+      include('insert.php');
+    }
+    if ($_POST['action'] == 'update') {
+      include('update.php');
+    }
+    
+  }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idd'])) {
+  if (empty($deleteError)) {
+    $_SESSION['idd'] = $_POST['idd'];
+    if ($_POST['action'] == 'delete') {
+      include('delete.php');
+    }
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Director Dashboard</title>
+  <link rel= 'icon' href = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" >
   <style>
     body {
       display: flex;
@@ -140,7 +200,7 @@
     }
 
     .delForm.show{
-      height: 150px; 
+      height: 200px; 
       opacity: 1;
     }
     
@@ -179,18 +239,29 @@
   <div class="sidebar" id="sidebar">
     <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Director Icon" />
     <h2>Director Dashboard</h2>
-    <label for="id">ID:</label>
-    <input type="text" id="id" />
-    <label for="name">Name:</label>
-    <input type="text" id="name" />
+    <?php echo $Admin; ?>
+    <label for="id">Class:</label>
+    <input type="text" id="class" name="class"/>
+    <label for="module">Module:</label>
+    <input type="text" id="module" name ="module"/>
+    <label for="email">Full Name:</label>
+    <input type="text" id="name" name="name"/>
+    <?php echo $nameError; ?>
     <label for="email">Email:</label>
-    <input type="text" id="email" />
+    <input type="text" id="email" name="email"/>
+    <?php echo $emailError; ?>
+    <label for="name">Password:</label>
+    <input type="text" id="password" name="password"/>
+    <?php echo $passError; ?>
     <button>ADD</button>
     <button>UPDATE</button>
-    <p class="delete delink">⛔ DELETE</p>
+    <p class="delete delink">৲ DELETE</p>
     <div class="delForm">
-      <label for="delete-id">Enter ID to delete:</label>
-      <input type="text" id="delete-id" />
+      <?php echo $delAdmin; ?>
+      <label for="delete-class">Enter Class to delete:</label>
+      <input type="text" id="delete-class" />
+      <label for="delete-class">Enter Module to delete:</label>
+      <input type="text" id="delete-class" />
       <button>DELETE</button>
     </div>
   </div>
@@ -200,10 +271,13 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Name</th>
+          <th>Class</th>
+          <th>Module</th>
+          <th>Full Name</th>
           <th>Email</th>
+          <th>Password</th>
         </tr>
+        
       </thead>
       <tbody>
       </tbody>
@@ -228,7 +302,6 @@
       }
     });
 
-    // Show/hide delete form
     deleteLink.addEventListener('click', () => {
       deleteForm.classList.toggle('show');
     });
