@@ -127,19 +127,23 @@
     tr:nth-child(even) {
       background: #f2f2f2;
     }
-
+    
     .delForm {
-      display: none;
       margin-top: 20px;
       background: #f8f8f8;
       padding: 20px;
       border-radius: 6px;
+      height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.5s ease;
     }
 
-    .delForm.show {
-      display: block;
+    .delForm.show{
+      height: 150px; 
+      opacity: 1;
     }
-
+    
     .delink {
       color: red;
       cursor: pointer;
